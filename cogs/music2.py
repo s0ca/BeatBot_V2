@@ -14,9 +14,6 @@ from discord.ext import commands
 from discord.utils import get
 from asyncio import run_coroutine_threadsafe
 
-# bot = discord.self()
-# bot._skip_check = lambda x, y: False
-# youtube_dl.utils.bug_reports_message = lambda: ''
 
 class VoiceError(Exception):
     pass
@@ -138,16 +135,15 @@ class Song:
 
     def create_embed(self):
         embed = (discord.Embed(colour=discord.Colour.green(),
-                               title='En cours de lecture',
+                               title='Now Playing',
                                description='```css\n{0.source.title}\n```'.format(self),
                                timestamp= datetime.datetime.now(),
                                color=discord.Color.blurple())
-                 .add_field(name='Durée', value=self.source.duration, inline=False)
-                 .add_field(name='Demandé par', value=self.requester.mention)
-                 .add_field(name='Lien direct', value='[Ici]({0.source.url})'.format(self))
+                 .add_field(name='Duration', value=self.source.duration, inline=False)
+                 .add_field(name='Queried by', value=self.requester.mention)
+                 .add_field(name='Direct link', value='[Here]({0.source.url})'.format(self))
                  .set_thumbnail(url=self.source.thumbnail)
-                 .set_footer(text='BeatBot Beta 1.0.7'))
-
+                 .set_footer(text='BeatBot REV2'))
         return embed
 
 class SongQueue(asyncio.Queue):
@@ -269,7 +265,7 @@ class VoiceState:
 
         if self.voice:
             await self.voice.disconnect()
-            await bot.change_presence(status=discord.Status.idle) #Change le status du bot lors de la déco
+            await self.bot.change_presence(status=discord.Status.idle) #Change le status du bot lors de la déco
             self.voice = None
 
 class Music2(commands.Cog):
@@ -299,7 +295,7 @@ class Music2(commands.Cog):
         ctx.voice_state = self.get_voice_state(ctx)
 
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
-        await ctx.send('Une erreur est survenue: {}'.format(str(error)))
+        await ctx.send('An error occurred: {}'.format(str(error)))
 
     #COMMANDE JOIN
     @commands.command(name='join', invoke_without_subcommand=True)
@@ -335,13 +331,13 @@ class Music2(commands.Cog):
             return await ctx.send('Non connecté à un canal vocal.')
 
         await ctx.voice_state.stop()
-        await bot.change_presence(status=discord.Status.idle)
+        await self.bot.change_presence(status=discord.Status.idle)
         del self.voice_states[ctx.guild.id]
         print(f"Déconnection à la demande de l'utilisateur")
 
     #COMMANDE VOLUME
     @commands.command(aliases=['vol','v'])
-    async def volume(self, ctx, volume: int):
+    async def volume(self, ctx, *, volume: float):
         if ctx.voice_client is None:
             return await ctx.send("Non connecté à un canal vocal.")
 
@@ -474,43 +470,43 @@ class Music2(commands.Cog):
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
-                await ctx.send('Une erreur s\'est produite lors du traitement de cette demande: {}'.format(str(e)))
+                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
             else:
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('{} ajouté'.format(str(source)))
+                await ctx.send('{} added'.format(str(source)))
                 await ctx.message.add_reaction('💾')
-                await bot.change_presence(status=discord.Status.online, activity=discord.Game("🎶!help🎹!now🎶")) #Change le status du bot
+                await self.bot.change_presence(status=discord.Status.online, activity=discord.Game("🎶!help🎹!now🎶")) #Change le status du bot
 
-    #COMMANDE PLAYLIST
-    #Lecture d'un fichier et envoi d'un message par ligne
-    @commands.command(name='pl1')
-    async def pl1(self, ctx: commands.Context):
-        
-        if not ctx.voice_state.voice:
-            await ctx.invoke(self._join)
-
-        with open("./playlist/01_[Fanatic12000]_abduction01") as f:
-            data = f.readlines()
-        for i in data:
-                await ctx.send(f"!p {i}")
-                time.sleep(1)
+#    #COMMANDE PLAYLIST
+#    #Lecture d'un fichier et envoi d'un message par ligne
+#    @commands.command(name='pl1')
+#    async def pl1(self, ctx: commands.Context):
+#        
+#        if not ctx.voice_state.voice:
+#            await ctx.invoke(self._join)
+#
+#        with open("./playlist/01_[Fanatic12000]_abduction01") as f:
+#            data = f.readlines()
+#        for i in data:
+#                await ctx.send(f"!p {i}")
+#                time.sleep(1)
     
     
-    #Liste les playlist dispo 
-    @commands.command(name='pll')
-    async def pll(self, ctx: commands.Context, *, page: int = 1):
-
-        playlist = []
-        for x in (os.listdir('./playlist')):
-            playlist.append(x)
-            playlist.sort()
-        
-        embed = (discord.Embed(title="Playlist Dispos", description='\n'.join(playlist), color=0xff8040)
-             .set_footer(text=f"Quémandé par: {ctx.author}"))
-             #.set_footer(text='Page {}/{}'.format(page, pages)))
-        await ctx.send(embed=embed)
+#    #Liste les playlist dispo 
+#    @commands.command(name='pll')
+#    async def pll(self, ctx: commands.Context, *, page: int = 1):
+#
+#        playlist = []
+#        for x in (os.listdir('./playlist')):
+#            playlist.append(x)
+#            playlist.sort()
+#        
+#        embed = (discord.Embed(title="Playlist Dispos", description='\n'.join(playlist), color=0xff8040)
+#             .set_footer(text=f"Quémandé par: {ctx.author}"))
+#             #.set_footer(text='Page {}/{}'.format(page, pages)))
+#        await ctx.send(embed=embed)
 
 
     #Check si l'utilisateur qui demande la lecture est dans un canal vocal
@@ -518,31 +514,11 @@ class Music2(commands.Cog):
     @_play.before_invoke
     async def ensure_voice_state(self, ctx: commands.Context):
         if not ctx.author.voice or not ctx.author.voice.channel:
-            raise commands.CommandError("Vous n'êtes connecté à aucun canal vocal.")
+            raise commands.CommandError("You're not connected to any voice channel. ")
 
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
-                raise commands.CommandError("BeatBot est déjà dans un canal vocal.")
-
-#EVENTS ###############################################################
-@bot.event
-async def on_message(message):
-    ctx = await bot.get_context(message)
-    await bot.invoke(ctx)
-
-
-#LISTENERS ###############################################################
-
-
-# connard
-@bot.listen()
-async def on_message(message):  
-    if "connard" in message.content:
-        connard_answ =[
-            'Oui?','C\'est mon deuxieme prénom','On m\'appelle?', 'Tu te trompes de personne, je ne suis pas <@265781552926031872>', 'C\'est toi le connard non mais!', 
-            'Qui m\'invoque?', 'Pourquoi tu t\'appelles toi même ?', 'Tu m\'as pris pour <@268109733666226176> ou quoi ?']
-        reponse = random.choice(connard_answ)
-        await message.channel.send(reponse)
+                raise commands.CommandError("BeatBot is already connected to a voice channel.")
 
 def setup(bot):
     bot.add_cog(Music2(bot))

@@ -20,7 +20,7 @@ bot = commands.Bot(command_prefix="!", allowed_mentions = discord.AllowedMention
 bot.remove_command('help')
 
 # Each extension corresponds to a file within the cogs directory.  Remove from the list to take away the functionality.
-extensions = ['music', 'ctftime', 'encoding', 'cipher', 'utility']
+extensions = ['music2', 'ctftime', 'encoding', 'cipher', 'utility']
 
 @bot.event
 async def on_ready():
