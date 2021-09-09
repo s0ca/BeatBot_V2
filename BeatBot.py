@@ -13,7 +13,7 @@ import random
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD = os.getenv("DISCORD_GUILD")
+GUILD = os.getenv("DISCORD_GUILD") 
 
 client = discord.Client()
 bot = commands.Bot(command_prefix="!", allowed_mentions = discord.AllowedMentions(everyone = False, users=False, roles=False))
