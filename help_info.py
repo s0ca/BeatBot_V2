@@ -68,7 +68,7 @@ info for all ctftime commands
 everything else! (basically misc)
 
 `!report/request "an issue or feature"`
-report an issue, or request a feature for this Bot, if it is helpful your name will be added to the 'cool names' list!
+report an issue, or request a feature for this Bot
 '''
 
 
