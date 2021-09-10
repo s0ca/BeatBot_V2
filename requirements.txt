@@ -5,3 +5,5 @@ colorama
 urllib3
 python-dateutil
 dnspython
+python-dotenv
+youtube-dl

@@ -1,32 +1,23 @@
-import collections
-import string
-import urllib.parse
-import random
 import json
 import discord
 from discord.ext import commands
 
 
 class Utility(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.command(aliases=['char'])
     async def characters(self, ctx, string):
         await ctx.send(len(string))
 
-
     @commands.command(aliases=['wc'])
     async def wordcount(self, ctx, *args):
         await ctx.send(len(args))
 
-
     @commands.command(aliases=['rev'])
     async def reverse(self, ctx, message):
         await ctx.send(message[::(- 1)])
-
 
     @commands.command()
     async def counteach(self, ctx, message):
@@ -38,7 +29,6 @@ class Utility(commands.Cog):
             else:
                 count[char] = 1
         await ctx.send(str(count))
-
 
     @commands.command(aliases=['head'])
     async def magicb(self, ctx, filetype):
@@ -53,7 +43,6 @@ class Utility(commands.Cog):
         except: # if the filetype is not in magicb.json...
             await ctx.send(f"{filetype} not found :(  If you think this filetype should be included please do `!request \"magicb {filetype}\"`")
 
-   
     @commands.command(name='purge') #Bug de limit 
     async def purge(self, ctx, messages: int = 5):
         if messages > 100:
@@ -62,7 +51,6 @@ class Utility(commands.Cog):
         removed = messages
         await ctx.send(f"{removed} messages removed")
         print(f"{removed} messages removed")
-
     
     @commands.command(name='whois',aliases=['wois', 'whoi', 'hois','wohis'])
     async def userinfo(self, ctx, member: discord.Member = None):
@@ -85,6 +73,7 @@ class Utility(commands.Cog):
         whois_e.add_field(name="Roles:", value="\n".join([role.mention for role in roles]))
         whois_e.add_field(name="Highest role:", value=member.top_role.mention)
         await ctx.send(embed=whois_e)
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))
