@@ -6,21 +6,17 @@ Authors: s0ca, zM_
 
 import os
 import sys
-from dotenv import load_dotenv
+import random
 import discord
 from discord.ext import commands
-import help_info
-import random
 
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD = os.getenv("DISCORD_GUILD")
-OWNER = int(os.getenv("DISCORD_OWNER"))
+import settings
+from help import Help
 
 client = discord.Client()
-bot = commands.Bot(command_prefix="!",
-                   allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False))
-bot.remove_command('help')
+bot = commands.Bot(command_prefix=settings.PREFIX,
+                   allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False),
+                   description="**__BiteBotte__ - Bot de stream musical**")
 
 # Each extension corresponds to a file within the cogs directory.  Remove from the list to take away the functionality.
 extensions = ['music2', 'ctftime', 'encoding', 'cipher', 'utility']
@@ -35,29 +31,6 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="!help | !source"))
 
 
-@bot.command()
-async def help(ctx, page=None):
-    # Custom help command.  Each main category is set as a 'page'.
-    if page == 'ctftime':
-        emb = discord.Embed(description=help_info.ctftime_help, colour=4387968)
-        emb.set_author(name='CTFTime Help')
-    elif page == 'ctf':
-        emb = discord.Embed(description=help_info.ctf_help, colour=4387968)
-        emb.set_author(name='CTF Help')
-    elif page == 'utility':
-        emb = discord.Embed(description=help_info.utility_help, colour=4387968)
-        emb.set_author(name='Utilities Help')
-    elif page == 'music':
-        emb = discord.Embed(description=help_info.music_help, colour=4387968)
-        emb.set_author(name='Music Help')
-    else:
-        emb = discord.Embed(description=help_info.help_page, colour=4387968)
-        emb.set_author(name='BeatBot Help')
-
-    await attach_embed_info(ctx, emb)
-    await ctx.channel.send(embed=emb)
-
-
 async def attach_embed_info(ctx=None, embed=None):
     embed.set_thumbnail(url=f'{bot.user.avatar_url}')
     return embed
@@ -65,12 +38,14 @@ async def attach_embed_info(ctx=None, embed=None):
 
 @bot.command()
 async def source(ctx):
-    # Sends the github link of the bot.
-    await ctx.send(help_info.src)
+    await ctx.send('https://github.com/ZanyMonk/beatbot')
 
 
 @bot.event
 async def on_command_error(ctx, error):
+    print('Exception raised following message from "{}"'.format(ctx.author), file=sys.stderr)
+    print(error, file=sys.stderr)
+
     if isinstance(error, commands.CommandNotFound):
         nop_e = discord.Embed(
             colour=discord.Colour.red(),
@@ -81,21 +56,21 @@ async def on_command_error(ctx, error):
                         inline=True)
         nop_e.add_field(name="Un petit coup de pouce ?", value=f"```css\n!help```")
         await ctx.send(embed=nop_e)
-    if isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send("Missing a required argument.  Do !help")
-    if isinstance(error, commands.MissingPermissions):
+    elif isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have the appropriate permissions to run this command.")
-    if isinstance(error, commands.BotMissingPermissions):
+    elif isinstance(error, commands.BotMissingPermissions):
         await ctx.send("I don't have sufficient permissions!")
     else:
-        print("error not caught")
-        print(error)
+        await ctx.send(embed=discord.Embed(colour=discord.Colour.red(), title=type(error.original).__name__,
+                                           description=error))
 
 
 @bot.command()
 async def request(ctx, feature):
     # Bot sends a dm to creator with the name of the user and their request.
-    creator = await bot.fetch_user(OWNER)
+    creator = await bot.fetch_user(settings.OWNER)
     authors_name = str(ctx.author)
     await creator.send(f''':pencil: {authors_name}: {feature}''')
     await ctx.send(f''':pencil: Thanks, "{feature}" has been requested!''')
@@ -104,7 +79,7 @@ async def request(ctx, feature):
 @bot.command()
 async def report(ctx, error_report):
     # Bot sends a dm to creator with the name of the user and their report.
-    creator = await bot.fetch_user(OWNER)
+    creator = await bot.fetch_user(settings.OWNER)
     authors_name = str(ctx.author)
     await creator.send(f''':triangular_flag_on_post: {authors_name}: {error_report}''')
     await ctx.send(f''':triangular_flag_on_post: Thanks for the help, "{error_report}" has been reported!''')
@@ -126,12 +101,14 @@ async def on_message(message):
         reponse = random.choice(connard_answ)
         await message.channel.send(reponse)
 
+bot.help_command = Help()
 
 if __name__ == '__main__':
     sys.path.insert(1, os.getcwd() + '/cogs/')
+
     for extension in extensions:
         try:
             bot.load_extension(extension)
         except Exception as e:
             print(f'Failed to load cogs : {e}')
-    bot.run(TOKEN)
+    bot.run(settings.TOKEN)

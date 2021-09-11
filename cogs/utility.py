@@ -4,23 +4,21 @@ from discord.ext import commands
 
 
 class Utility(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.command(aliases=['char'])
-    async def characters(self, ctx, string):
+    @commands.command(aliases=['characters', 'char'],
+                      help="count characters in given string")
+    async def length(self, ctx, string):
         await ctx.send(len(string))
 
-    @commands.command(aliases=['wc'])
+    @commands.command(aliases=['wc'], help="count words in given string")
     async def wordcount(self, ctx, *args):
         await ctx.send(len(args))
 
-    @commands.command(aliases=['rev'])
+    @commands.command(aliases=['rev'], help="reverse characters in given string")
     async def reverse(self, ctx, message):
         await ctx.send(message[::(- 1)])
 
-    @commands.command()
-    async def counteach(self, ctx, message):
+    @commands.command(help="count each character occurrences in the given string")
+    async def count(self, ctx, message):
         # Count the amount of characters in a string.
         count = {}
         for char in message:
@@ -30,11 +28,11 @@ class Utility(commands.Cog):
                 count[char] = 1
         await ctx.send(str(count))
 
-    @commands.command(aliases=['head'])
-    async def magicb(self, ctx, filetype):
-        # Get the magic bytes from a filetype
+    @commands.command(aliases=['head', 'magicb'], help="show known file signatures for given format")
+    async def file(self, ctx, filetype):
         file = open('magic.json').read()
         alldata = json.loads(file)
+
         try:
             messy_signs = str(alldata[filetype]['signs'])
             signs = messy_signs.split('[')[1].split(',')[0].split(']')[0].replace("'", '')
@@ -43,7 +41,7 @@ class Utility(commands.Cog):
         except: # if the filetype is not in magicb.json...
             await ctx.send(f"{filetype} not found :(  If you think this filetype should be included please do `!request \"magicb {filetype}\"`")
 
-    @commands.command(name='purge') #Bug de limit 
+    @commands.command(name='purge', help="delete messages, from latest to earliest (default: 5)") #Bug de limit
     async def purge(self, ctx, messages: int = 5):
         if messages > 100:
             return ctx.send("Wow relax, it's already been a lot!")
@@ -52,8 +50,8 @@ class Utility(commands.Cog):
         await ctx.send(f"{removed} messages removed")
         print(f"{removed} messages removed")
     
-    @commands.command(name='whois',aliases=['wois', 'whoi', 'hois','wohis'])
-    async def userinfo(self, ctx, member: discord.Member = None):
+    @commands.command(aliases=['info', 'wois', 'whoi', 'hois', 'wohis'], help="show info about given member")
+    async def whois(self, ctx, member: discord.Member = None):
         if not member:
             member = ctx.message.author
         roles = [role for role in member.roles[1:]]
@@ -76,4 +74,4 @@ class Utility(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Utility(bot))
+    bot.add_cog(Utility())

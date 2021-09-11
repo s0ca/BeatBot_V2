@@ -1,4 +1,4 @@
-discord.py
+discord-interactions  # pipx: alias='discord'
 pymongo
 requests
 colorama
