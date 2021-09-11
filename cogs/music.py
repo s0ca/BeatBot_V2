@@ -5,6 +5,7 @@ import asyncio
 import itertools
 import sys
 import traceback
+from datetime import *
 from async_timeout import timeout
 from functools import partial
 from youtube_dl import YoutubeDL
@@ -108,7 +109,7 @@ class MusicPlayer:
         embed = (discord.Embed(colour=discord.Colour.green(),
                                title='En cours de lecture',
                                description='```css\n{0.source.title}\n```'.format(self),
-                               timestamp= datetime.datetime.now(),
+                               timestamp=datetime.now(),
                                color=discord.Color.blurple())
                  .add_field(name='Durée', value=self.source.duration, inline=False)
                  .add_field(name='Demandé par', value=self.requester.mention)

@@ -273,6 +273,22 @@ class Music2(commands.Cog):
         self.bot = bot
         self.voice_states = {}
 
+    # Play videos that receive certain reactions
+    async def on_reaction_add(self, reaction, user):
+        msg = reaction.message
+        emoji = str(reaction)
+        ascii_emoji = emoji if emoji[0] != '<' else ':{}:'.format(emoji.split(':')[1])
+
+        if msg.author.bot:
+            return
+
+        for embed in msg.embeds:
+            if embed.video and ascii_emoji in ["🎵","⏯","👂","<:butplug:882625527725318144>"]:
+                ctx = await self.bot.get_context(msg)
+                ctx.voice_state = self.get_voice_state(ctx)
+                await ctx.invoke(self._play, search=embed.video.url)
+                break
+
     def get_voice_state(self, ctx: commands.Context):
         state = self.voice_states.get(ctx.guild.id)
         if not state or not state.exists:
@@ -479,6 +495,8 @@ class Music2(commands.Cog):
                 await ctx.message.add_reaction('💾')
                 await self.bot.change_presence(status=discord.Status.online, activity=discord.Game("🎶!help🎹!now🎶")) #Change le status du bot
 
+
+
 #    #COMMANDE PLAYLIST
 #    #Lecture d'un fichier et envoi d'un message par ligne
 #    @commands.command(name='pl1')
@@ -521,4 +539,10 @@ class Music2(commands.Cog):
                 raise commands.CommandError("BeatBot is already connected to a voice channel.")
 
 def setup(bot):
-    bot.add_cog(Music2(bot))
+    instance = Music2(bot)
+
+    @bot.event
+    async def on_reaction_add(reaction, user):
+        await instance.on_reaction_add(reaction, user)
+
+    bot.add_cog(instance)

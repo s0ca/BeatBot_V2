@@ -13,7 +13,6 @@ from discord.ext import commands
 import settings
 from help import Help
 
-client = discord.Client()
 bot = commands.Bot(command_prefix=settings.PREFIX,
                    allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False),
                    description="**__BiteBotte__ - Bot de stream musical**")
