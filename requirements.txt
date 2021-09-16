@@ -1,4 +1,4 @@
-discord-interactions  # pipx: alias='discord'
+discord.py  # pipx: alias='discord'
 pymongo
 requests
 colorama
@@ -7,3 +7,4 @@ python-dateutil
 dnspython
 python-dotenv
 youtube-dl
+pynacl

@@ -56,7 +56,7 @@ async def on_command_error(ctx, error):
         nop_e.add_field(name="Un petit coup de pouce ?", value=f"```css\n!help```")
         await ctx.send(embed=nop_e)
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("Missing a required argument.  Do !help")
+        await ctx.send("Missing a required argument.  Try `!help`")
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send("You do not have the appropriate permissions to run this command.")
     elif isinstance(error, commands.BotMissingPermissions):
