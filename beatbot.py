@@ -15,7 +15,7 @@ from help import Help
 
 bot = commands.Bot(command_prefix=settings.PREFIX,
                    allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False),
-                   description="**__BiteBotte__ - Bot de stream musical**")
+                   description="**__BeatBot__ - Bot de stream musical**")
 
 # Each extension corresponds to a file within the cogs directory.  Remove from the list to take away the functionality.
 extensions = ['music2', 'ctftime', 'encoding', 'cipher', 'utility']
