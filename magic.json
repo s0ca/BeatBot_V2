@@ -600,5 +600,34 @@
         ],
         "mime": "video/x-msvideo"
 
-    }
+    },
+    "pcap": {
+        "signs": [
+            "D4 C3 B2 A1 little endian",
+            "A1 B2 C3 D4 big endian"
+        ],
+        "mime": "application/vnd"
+
+    },
+    "xls": {
+        "signs": [
+            "D0 CF 11 E0 A1 B1 1A E1"
+        ],
+        "mime": "application/vnd.ms-excel"
+
+    },
+    "dmg": {
+        "signs": [
+            "64 65 78 0A 30 33 35 00"
+        ],
+        "mime": "application/octet-stream"
+
+    },
+    "cab": {
+        "signs": [
+            "4D 53 43 46 "
+        ],
+        "mime": "application/vnd.ms-cab-compressed"
+
+    },
 }
