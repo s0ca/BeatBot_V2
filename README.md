@@ -14,7 +14,7 @@ docker-compose up
 
 ### Boomer
 ```shell
-git clone https://github.com/ZanyMonk/beatbot
+git clone https://github.com/s0ca/BeatBot_V2 beatbot
 cd beatbot
 pip install -r requirement.txt
 ./beatbot.py
