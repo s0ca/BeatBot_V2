@@ -20,10 +20,6 @@ class CtfTime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.upcoming_l = []
-        # self.updateDB.start() # pylint: disable=no-member
-
-    # def cog_unload(self):
-    # self.updateDB.cancel() # pylint: disable=no-member
 
     # @tasks.loop(minutes=30.0, reconnect=True)
     async def updateDB(self):
@@ -67,18 +63,6 @@ class CtfTime(commands.Cog):
             }
             info.append(ctf)
 
-        got_ctfs = []
-        for ctf in info:  # If the document doesn't exist: add it, if it does: update it.
-            query = ctf['name']
-            ctfs.update({'name': query}, {"$set": ctf}, upsert=True)
-            got_ctfs.append(ctf['name'])
-        print(Fore.WHITE + f"{datetime.now()}: " + Fore.GREEN + f"Got and updated {got_ctfs}")
-        print(Style.RESET_ALL)
-
-        for ctf in ctfs.find():  # Delete ctfs that are over from the db
-            if ctf['end'] < unix_now:
-                ctfs.remove({'name': ctf['name']})
-
     # @updateDB.before_loop
     async def before_updateDB(self):
         await self.bot.wait_until_ready()
@@ -89,33 +73,6 @@ class CtfTime(commands.Cog):
         if ctx.invoked_subcommand is None:
             ctftime_commands = list(set([c.qualified_name for c in CtfTime.walk_commands(self)][1:]))
             await ctx.send(f"Current ctftime commands are: ``{', '.join(ctftime_commands)}``")
-
-    # @ctftime.command(aliases=['now', 'running'])
-    # async def current(self, ctx):
-    #     # Send discord embeds of the currently running ctfs.
-    #     now = datetime.utcnow()
-    #     unix_now = int(now.replace(tzinfo=timezone.utc).timestamp())
-    #     running = False
-
-    #     for ctf in ctfs.find():
-    #         if ctf['start'] < unix_now and ctf['end'] > unix_now: # Check if the ctf is running
-    #             running = True
-    #             embed = discord.Embed(title=':red_circle: ' + ctf['name']+' IS LIVE', description=ctf['url'], color=15874645)
-    #             start = datetime.utcfromtimestamp(ctf['start']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-    #             end = datetime.utcfromtimestamp(ctf['end']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-    #             if ctf['img'] != '':
-    #                 embed.set_thumbnail(url=ctf['img'])
-    #             else:
-    #                 embed.set_thumbnail(url="https://pbs.twimg.com/profile_images/2189766987/ctftime-logo-avatar_400x400.png")
-    #                 # CTFtime logo
-
-    #             embed.add_field(name='Duration', value=ctf['dur'], inline=True)
-    #             embed.add_field(name='Format', value=ctf['format'], inline=True)
-    #             embed.add_field(name='Timeframe', value=start+' -> '+end, inline=True)
-    #             await ctx.channel.send(embed=embed)
-
-    #     if running == False: # No ctfs were found to be running
-    #         await ctx.send("No CTFs currently running! Check out >ctftime countdown, and >ctftime upcoming to see when ctfs will start!")
 
     def _pull(self, path):
         if not path:
@@ -192,81 +149,6 @@ class CtfTime(commands.Cog):
                 leaderboards += f"\n[{rank}]   {teamname}: {score}\n"
 
         await ctx.send(f":triangular_flag_on_post:  **{year} CTFtime Leaderboards**```ini\n{leaderboards}```")
-
-        # LOG THIS
-    # @ctftime.command()
-    # async def timeleft(self, ctx):
-    #     # Send the specific time that ctfs that are currently running have left.
-    #     now = datetime.utcnow()
-    #     unix_now = int(now.replace(tzinfo=timezone.utc).timestamp())
-    #     running = False
-    #     for ctf in ctfs.find():
-    #         if ctf['start'] < unix_now and ctf['end'] > unix_now: # Check if the ctf is running
-    #             running = True
-    #             time = ctf['end'] - unix_now 
-    #             days = time // (24 * 3600)
-    #             time = time % (24 * 3600)
-    #             hours = time // 3600
-    #             time %= 3600
-    #             minutes = time // 60
-    #             time %= 60
-    #             seconds = time
-    #             await ctx.send(f"```ini\n{ctf['name']} ends in: [{days} days], [{hours} hours], [{minutes} minutes], [{seconds} seconds]```\n{ctf['url']}")
-
-    #     if running == False:
-    #         await ctx.send('No ctfs are running! Use >ctftime upcoming or >ctftime countdown to see upcoming ctfs')
-
-    # @ctftime.command()
-    # async def countdown(self, ctx, params=None):
-    #     # Send the specific time that upcoming ctfs have until they start.
-    #     now = datetime.utcnow()
-    #     unix_now = int(now.replace(tzinfo=timezone.utc).timestamp())
-
-    #     if params == None:
-    #         self.upcoming_l = []
-    #         index = ""
-    #         for ctf in ctfs.find():
-    #             if ctf['start'] > unix_now:
-    #                 # if the ctf start time is in the future...
-    #                 self.upcoming_l.append(ctf)
-    #         for i, c in enumerate(self.upcoming_l):
-    #             index += f"\n[{i + 1}] {c['name']}\n"
-
-    #         await ctx.send(f"Type >ctftime countdown <number> to select.\n```ini\n{index}```")
-    #     else:
-    #         if self.upcoming_l != []:
-    #             x = int(params) - 1     
-    #             start = datetime.utcfromtimestamp(self.upcoming_l[x]['start']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-    #             end = datetime.utcfromtimestamp(self.upcoming_l[x]['end']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-
-    #             time = self.upcoming_l[x]['start'] - unix_now 
-    #             days = time // (24 * 3600)
-    #             time = time % (24 * 3600)
-    #             hours = time // 3600
-    #             time %= 3600
-    #             minutes = time // 60
-    #             time %= 60
-    #             seconds = time
-
-    #             await ctx.send(f"```ini\n{self.upcoming_l[x]['name']} starts in: [{days} days], [{hours} hours], [{minutes} minutes], [{seconds} seconds]```\n{self.upcoming_l[x]['url']}")
-    #         else: # TODO: make this a function, too much repeated code here.
-    #             for ctf in ctfs.find():
-    #                 if ctf['start'] > unix_now:
-    #                     self.upcoming_l.append(ctf)
-    #             x = int(params) - 1     
-    #             start = datetime.utcfromtimestamp(self.upcoming_l[x]['start']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-    #             end = datetime.utcfromtimestamp(self.upcoming_l[x]['end']).strftime('%Y-%m-%d %H:%M:%S') + ' UTC'
-
-    #             time = self.upcoming_l[x]['start'] - unix_now 
-    #             days = time // (24 * 3600)
-    #             time = time % (24 * 3600)
-    #             hours = time // 3600
-    #             time %= 3600
-    #             minutes = time // 60
-    #             time %= 60
-    #             seconds = time
-
-    #             await ctx.send(f"```ini\n{self.upcoming_l[x]['name']} starts in: [{days} days], [{hours} hours], [{minutes} minutes], [{seconds} seconds]```\n{self.upcoming_l[x]['url']}")
 
 
 def setup(bot):
