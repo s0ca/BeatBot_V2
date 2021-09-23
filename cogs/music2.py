@@ -269,7 +269,7 @@ class VoiceState:
             self.voice = None
 
 
-class Music2(commands.Cog):
+class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.voice_states = {}
@@ -555,7 +555,7 @@ class Music2(commands.Cog):
 
 
 def setup(bot):
-    instance = Music2(bot)
+    instance = Music(bot)
 
     bot.add_listener(instance.on_reaction_add)
     bot.add_listener(instance.on_message)

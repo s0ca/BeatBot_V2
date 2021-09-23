@@ -13,7 +13,7 @@ from discord.ext import commands
 import settings
 from help import Help
 
-bot = commands.Bot(command_prefix=settings.PREFIX,
+bot = commands.Bot(command_prefix=settings.PREFIX, case_insensitive=True,
                    allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=False),
                    description="**__BeatBot__ - Bot de stream musical**")
 
@@ -37,7 +37,7 @@ async def attach_embed_info(ctx=None, embed=None):
 
 @bot.command()
 async def source(ctx):
-    await ctx.send('https://github.com/ZanyMonk/beatbot')
+    await ctx.send('https://github.com/s0ca/BeatBot_V2')
 
 
 @bot.event
