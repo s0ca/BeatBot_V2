@@ -4,6 +4,8 @@
 Beatbot is a self-hostable, single-server, home-made audio streaming bot that can
 take input from YouTube, SoundCloud and virtually every platform `youtube-dl` supports.
 
+Some CTF tools are also include
+
 ## Getting started
 ### Docker
 ```shell
