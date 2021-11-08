@@ -22,6 +22,10 @@ pip install -r requirement.txt
 ./beatbot.py
 ```
 
+### For Windows users (for real ?) 
+```whell
+.env files are buggy, you might need to hardcode the content of your .env file in beatbot.py 
+```
 
 ## @TODO
 - [ ] Fix vocal channel management
