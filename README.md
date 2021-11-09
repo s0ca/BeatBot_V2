@@ -19,6 +19,7 @@ docker-compose up
 git clone https://github.com/s0ca/BeatBot_V2 beatbot
 cd beatbot
 pip install -r requirement.txt
+edit .env.sample with your creds and save it as .env
 ./beatbot.py
 ```
 
